@@ -36,7 +36,8 @@ public class GuestLogin {
         this.X_KV="f14dd39f";        //KV的生成
         this.prm_1= UUID.randomUUID().toString();
         this.prm_2=UUID.randomUUID().toString();
-        String uniqueidStr= deviceInfoUtil.getImei()+deviceInfoUtil.getRouter_mac();
+        String imei="";
+        String uniqueidStr= imei+deviceInfoUtil.getRouter_mac();
         try {
             this.prm_3= ParamUtil.getInstance().getPrm_3(uniqueidStr+ StringUtil.getInstance().getMD5(prm_1).substring(0,8)+StringUtil.getInstance().getMD5(prm_2).substring(24)).substring(10, 22);
         } catch (NoSuchAlgorithmException e) {
@@ -76,7 +77,7 @@ public class GuestLogin {
         String RequestBody= null;
         try {
             RequestBody = "prm_3="+prm_3+"&gapps="+ deviceInfo.getGapps()+"&prm_2="+prm_2+"&prm_1="+prm_1+"&buildnumber=" +URLEncoder.encode(deviceInfo.getBuildnumber(),"GBK")+"&mmuid="+
-                    "&screen="+ deviceInfo.getScreen()+"&device_type="+ deviceInfo.getDevice_type()+"&imsi="+ deviceInfo.getImsi()+"&emu="+ deviceInfo.getEmu()+"&mac="+ URLEncoder.encode(deviceInfo.getMac(),"GBK")+"&manufacturer="+ deviceInfo.getManufacturer()+
+                    "&screen="+ deviceInfo.getScreen()+"&device_type="+ deviceInfo.getDevice_type()+"&imsi=unknown"+"&emu="+ deviceInfo.getEmu()+"&mac="+ URLEncoder.encode(deviceInfo.getMac(),"GBK")+"&manufacturer="+ deviceInfo.getManufacturer()+
                     "&osversion_int="+ deviceInfo.getOsversion_int()+"&rom="+ deviceInfo.getRom()+"&uid="+ deviceInfo.getUid()+"&market_source="+ deviceInfo.getMarket_source()+"&model="+ deviceInfo.getModel()+""+"&uniqueid="+URLEncoder.encode(deviceInfo.getUniqueid(),"GBK")+
                     "&oaid="+"&androidId="+ deviceInfo.getAndroidId()+"&_uid_="+ deviceInfo.get_uid_()+"&phone_type="+ deviceInfo.getPhone_type()+"&phone_netWork="+ deviceInfo.getPhone_netWork()+"&dpp="+ deviceInfo.getDpp()+"&idfa="+ deviceInfo.getIdfa()+
                     "&_iid="+ deviceInfo.get_iid()+"&version="+ deviceInfo.getVersion()+"&apksign="+ deviceInfo.getApksign()+"&_net_="+ deviceInfo.get_net_()+"&router_mac="+URLEncoder.encode(deviceInfo.getRouter_mac(),"GBK")+"&network_class="+ deviceInfo.getNetwork_class()+

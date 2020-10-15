@@ -3,6 +3,8 @@ package com.login;
 import com.constantfield.RequestUrl;
 import com.utiltool.*;
 import net.sf.json.JSONObject;
+
+import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.*;
 
@@ -35,7 +37,7 @@ public class PwdLogin {
         this.deviceInfo =deviceInfo;
         this.headerInfo =headerInfoUtil;
         this.X_Trace_Id=UUID.randomUUID().toString().toUpperCase();
-        this.aesKey=deviceInfo.getAesKey().substring(0,16);
+        this.aesKey=deviceInfo.getAesKey();
         this.publickey=deviceInfo.getPublic_key();
         this.map_id=ParamUtil.getInstance().getMapId();
     }
@@ -43,14 +45,7 @@ public class PwdLogin {
 
     public String pwdLogin(String session){
 
-        //byte[] respone= HttpUtil.postRetByte(RequestUrl.pwdLoginUrl + deviceInfo.getUid(), getBody(), getHeader(session));
-
-
-        //test>>>>>>>
-        byte[] respone= HttpUtil.postRetByte("https://api-mini.immomo.com/api/v2/login?fu=6766272a7e000278b21192236b3c3eb1", ParamUtil.getInstance().body(), ParamUtil.getInstance().header(session));
-        //test<<<<<<<
-
-        //System.out.println(Arrays.toString(respone));
+        byte[] respone= HttpUtil.postRetByte(RequestUrl.pwdLoginUrl + deviceInfo.getUid(), getBody(), getHeader(session));
 
         try {
             return CryptUtil.getInstance().decodeRespone(respone,aesKey);
@@ -61,16 +56,13 @@ public class PwdLogin {
     }
 
     private Map<String, String> getHeader(String session) {
-
         this.cookie=session;
         Map<String, String> headerMap = new LinkedHashMap<>();
         headerMap.put("X-SIGN",this.X_SIGN );
         headerMap.put("X-Trace-Id",this.X_Trace_Id);
         headerMap.put("Content-Length",this.Content_Length);
-
         headerMap.put("X-KV", this.X_KV);
         headerMap.put("cookie","SESSIONID="+ this.cookie);
-
         headerMap.put("X-LV", headerInfo.getX_LV());
         headerMap.put("Connection", headerInfo.getConnection());
         headerMap.put("Charset", headerInfo.getCharset());
@@ -81,7 +73,6 @@ public class PwdLogin {
         headerMap.put("Host", headerInfo.getHost());
         headerMap.put("Accept-Encoding", headerInfo.getAccept_Encoding());
         headerMap.put("MultiUA",headerInfo.getMultiUA());
-
         return headerMap;
     }
 
@@ -100,27 +91,24 @@ public class PwdLogin {
                 "BootSerialno:"+ deviceInfo.getBootSerialno()+","+"model:"+ deviceInfo.getModel();
 
         String BodyStr= string2Json(jsonStr);
-        //System.out.println(BodyStr);
-
-        this.X_KV= ParamUtil.getInstance().getXkv(publickey);
+        this.X_KV= ParamUtil.getInstance().getXkv(publickey);        //kv是publickey base64 encode   然后MD5 截8位
         try {
-            this.ck= URLEncoder.encode(ParamUtil.getInstance().getCk(publickey),"UTF-8");
+            this.ck= ParamUtil.getInstance().getCk(publickey);
         } catch (Exception e) {
             e.printStackTrace();
         }
 
         Map<String, String> infoMap = new HashMap<>();
+        infoMap.put("X-Span-Id",headerInfo.getX_Span_Id());
         infoMap.put("X-LV", headerInfo.getX_LV());
         infoMap.put("X-KV", this.X_KV);
+        infoMap.put("X-Trace-Id",this.X_Trace_Id);
 
-        this.X_SIGN = ParamUtil.getInstance().getXsign(BodyStr.getBytes(), infoMap, aesKey, deviceInfo.getUserAgent());  //第三个参数是aesKey
-
-        String mzip=StringUtil.getMzip(BodyStr,aesKey);
-
-        String RequestBody="code_version=" + deviceInfo.getCode_version() + "&map_id=" +this.map_id+ "&mzip="+mzip+"&X-KV="+this.X_KV+"&ck="+this.ck;
-
+        byte[] bytesMzip=StringUtil.getBytesMzip(BodyStr,aesKey);
+        String mzip = StringUtil.getMzip(bytesMzip);
+        this.X_SIGN = ParamUtil.getInstance().getXsign(bytesMzip, infoMap, aesKey, headerInfo.getMultiUA());  //param1:boday加密后的数据，第三个参数是aesKey
+        String RequestBody="code_version=" + deviceInfo.getCode_version() + "&mzip="+mzip + "&X-KV="+this.X_KV + "&map_id=" +this.map_id+"&ck="+this.ck;
         this.Content_Length =String.valueOf(RequestBody.length());
-
         return RequestBody;
     }
 

@@ -79,8 +79,8 @@ public class AccountOperation {
 
         this.X_SIGN = ParamUtil.getInstance().getXsign(bodyStr.getBytes(), infoMap, aesKey, deviceInfo.getUserAgent());
 
-        String mzip=StringUtil.getMzip(bodyStr,aesKey);
-
+        byte[] bytesMzip=StringUtil.getBytesMzip(bodyStr,aesKey);
+        String mzip = StringUtil.getMzip(bytesMzip);
         String RequestBody="mzip="+mzip;
 
         this.Content_Length=String.valueOf(RequestBody.length());

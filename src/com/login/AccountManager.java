@@ -28,20 +28,15 @@ public class AccountManager {
 
     public String pwdLogin(String Request){
         String session= ParamUtil.getInstance().getSession(Request);
-
         String request= pwdLogin.pwdLogin(session);
-
         return request;
     }
 
 
 
     public String check(String Request){
-
         String session = ParamUtil.getInstance().getSession(Request);
-
         String request=accountOperation.publishCheck(session);
-
         return request;
     }
 

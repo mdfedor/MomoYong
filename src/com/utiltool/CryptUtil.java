@@ -115,7 +115,30 @@ public class CryptUtil {
     }
 
 
-    public String momoEncode(byte[] src,byte[] key) throws Exception {
+//    public String momoEncode(byte[] src,byte[] key) throws Exception {
+//
+//        byte[] ivNUm=getIvNum();
+//        byte[] iv=ivGenerate(ivNUm);
+//
+//        byte[] outBytes= CryptUtil.getInstance().encrypt(src, key, iv);
+//        byte[] header=new byte[7];
+//        header[0]=02;
+//        header[1]=03;
+//
+//        System.arraycopy(ivNUm, 0, header, 2, 4);
+//        header[6]=00;
+//        byte[] total=new byte[outBytes.length+7];
+//        System.arraycopy(header, 0, total, 0, 7);
+//        System.arraycopy(outBytes, 0, total, 7, outBytes.length);
+//
+//        byte[] base64Str= Base64.getEncoder().encode(total);
+//
+//        String outStr=new String(base64Str);
+//
+//        return outStr;
+//    }
+
+    public byte[] momoEncode(byte[] src,byte[] key) throws Exception {
 
         byte[] ivNUm=getIvNum();
         byte[] iv=ivGenerate(ivNUm);
@@ -130,12 +153,7 @@ public class CryptUtil {
         byte[] total=new byte[outBytes.length+7];
         System.arraycopy(header, 0, total, 0, 7);
         System.arraycopy(outBytes, 0, total, 7, outBytes.length);
-
-        byte[] base64Str= Base64.getEncoder().encode(total);
-
-        String outStr=new String(base64Str);
-
-        return outStr;
+        return total;
     }
 
 
@@ -183,8 +201,12 @@ public class CryptUtil {
         }
         byte[] data = byteArrayOutputStream.toByteArray();
         byteArrayOutputStream.close();
-
-        String decodeStr= CryptUtil.getInstance().momoDecode(data,aesKey.getBytes());
+        String decodeStr= "";
+        try{
+            decodeStr= CryptUtil.getInstance().momoDecode(data,aesKey.getBytes());
+        }catch (Exception e){
+            return new String(data);
+        }
         return decodeStr;
     }
 

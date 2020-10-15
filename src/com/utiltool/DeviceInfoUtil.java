@@ -137,7 +137,7 @@ public class DeviceInfoUtil {
         this.uniquetime=jsonObject.getString("uniquetime");
         this.code_version=jsonObject.getString("code_version");
         this.public_key=jsonObject.getString("public_key");
-        this.aesKey=jsonObject.getString("aesKey");
+        this.aesKey=jsonObject.getString("aesKey").substring(0,16);
     }
 
     public String DeviceInfo2String() {

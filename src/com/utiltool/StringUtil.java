@@ -7,6 +7,7 @@ import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.Base64;
 import java.util.Formatter;
 import java.util.Random;
 import java.util.zip.GZIPInputStream;
@@ -189,21 +190,24 @@ public class StringUtil {
         return retStr;
     }
 
-    public static String getMzip(String jsonStr,String aesKey) {
+
+    public static byte[] getBytesMzip(String jsonStr,String aesKey) {
         try {
-            String mzip= CryptUtil.getInstance().momoEncode(jsonStr.getBytes(),aesKey.getBytes());
-            mzip= URLEncoder.encode(mzip,"UTF-8");
-            //mzip = mzip.substring(0, mzip.length() - 3);
-            return mzip;
+            return CryptUtil.getInstance().momoEncode(jsonStr.getBytes(),aesKey.getBytes());
         }catch (Exception e) {
             e.printStackTrace();
-            return "";
+            return null;
         }
     }
 
-
-
-
+    public static String getMzip(byte[] bytesMzip){
+        try {
+            return URLEncoder.encode(Base64.getEncoder().encodeToString(bytesMzip),"UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
     /*Read the file according to the specified character set*/
     public static String readToString(String fileName) {

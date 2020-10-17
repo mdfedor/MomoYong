@@ -13,7 +13,9 @@ public class Main {
 
       String pwdRet = manager.pwdLogin(gustRet);
 
-      String check=manager.check(pwdRet);
+      String checkRet=manager.check(pwdRet,"good morning joy");
+
+      String send=manager.send("good morning joy");
 
     }
 

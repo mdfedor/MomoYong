@@ -8,6 +8,7 @@ public class AccountManager {
     GuestLogin guestLogin;
     PwdLogin pwdLogin;
     AccountOperation accountOperation;
+    String session=null;
 
     private AccountInfoUtil accountInfo=AccountInfoUtil.getInstance(StringUtil.readToString("E:\\INFO\\account_info"));
     private DeviceInfoUtil deviceInfo=DeviceInfoUtil.getInstance(StringUtil.readToString("E:\\INFO\\device_infotest"));
@@ -33,11 +34,14 @@ public class AccountManager {
     }
 
 
-
-    public String check(String Request){
-        String session = ParamUtil.getInstance().getSession(Request);
-        String request=accountOperation.publishCheck(session);
+    public String check(String Request,String strContext){
+        session = ParamUtil.getInstance().getSession(Request);
+        String request=accountOperation.publishCheck(session,strContext);
         return request;
     }
 
+    public String send(String strContext){
+        String request=accountOperation.publishSend(session,strContext);
+        return request;
+    }
 }

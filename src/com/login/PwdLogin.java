@@ -90,7 +90,7 @@ public class PwdLogin {
                 "Serialno:"+ deviceInfo.getSerialno()+","+"_uidType:"+ deviceInfo.get_uidType()+","+"_iid:"+ deviceInfo.get_iid()+","+"uid:"+ deviceInfo.getUid()+","+"account:"+ accountInfo.getAccount()+","+"lat:"+ deviceInfo.getLat()+","+
                 "BootSerialno:"+ deviceInfo.getBootSerialno()+","+"model:"+ deviceInfo.getModel();
 
-        String BodyStr= string2Json(jsonStr);
+        String BodyStr= StringUtil.getInstance().string2Json(jsonStr);
         this.X_KV= ParamUtil.getInstance().getXkv(publickey);        //kv是publickey base64 encode   然后MD5 截8位
         try {
             this.ck= ParamUtil.getInstance().getCk(publickey);
@@ -112,19 +112,5 @@ public class PwdLogin {
         return RequestBody;
     }
 
-    public String string2Json(String str){
-        String[] arrayPair = str.split(",");
-        JSONObject jsonObject = new JSONObject();
-        String key=null;
-        String value=null;
-        for(int n=0; n < arrayPair.length; n++){
-            key=arrayPair[n].substring(0,arrayPair[n].indexOf(":"));
-            value=arrayPair[n].substring(key.length()+1,arrayPair[n].length());
-            jsonObject.put(key,value);
-        }
-        String jsonStr = jsonObject.toString();
-
-        return jsonStr;
-    }
 
 }

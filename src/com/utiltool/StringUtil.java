@@ -1,5 +1,7 @@
 package com.utiltool;
 
+import net.sf.json.JSONObject;
+
 import javax.imageio.ImageIO;
 import java.awt.image.BufferedImage;
 import java.io.*;
@@ -7,9 +9,7 @@ import java.math.BigInteger;
 import java.net.URLEncoder;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.util.Base64;
-import java.util.Formatter;
-import java.util.Random;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 /*
@@ -231,6 +231,49 @@ public class StringUtil {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public static String string2Json(String str){
+        String[] arrayPair = str.split(",");
+        List<String> listPair=new ArrayList<>();
+        List<String> listTmp=new ArrayList<>();
+        for(String jsStr:arrayPair){
+            if(jsStr.contains("[{")||jsStr.contains("}]")){
+                listTmp.add(jsStr);
+                continue;
+            }
+            listPair.add(jsStr);
+        }
+
+        if(listTmp.size()!=0){
+            Iterator iter=listTmp.iterator();
+            String strTmp="";
+            int count=0;
+            while (iter.hasNext()){
+                if(count%2==0){
+                    strTmp+=iter.next()+",";
+                }else
+                {
+                    strTmp+=iter.next();
+                }
+                count++;
+            }
+            listPair.add(strTmp);
+        }
+
+        JSONObject jsonObject = new JSONObject();
+        String key=null;
+        String value=null;
+
+        for(int n=0; n < listPair.size(); n++){
+            key=listPair.get(n).substring(0,listPair.get(n).indexOf(":"));
+            value=listPair.get(n).substring(key.length()+1,listPair.get(n).length());
+            jsonObject.put(key,value);
+        }
+
+        String jsonStr = jsonObject.toString();
+
+        return jsonStr;
     }
 
 

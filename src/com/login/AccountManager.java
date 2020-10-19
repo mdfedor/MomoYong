@@ -20,7 +20,6 @@ public class AccountManager {
         accountOperation=new AccountOperation(deviceInfo,accountInfo,headerInfo);
     }
 
-
     public String GustLogin(){
         String gustRequest= guestLogin.guestLogin();
         return gustRequest;
@@ -30,18 +29,30 @@ public class AccountManager {
     public String pwdLogin(String Request){
         String session= ParamUtil.getInstance().getSession(Request);
         String request= pwdLogin.pwdLogin(session);
+        this.session=ParamUtil.getInstance().getSession(request);
         return request;
     }
 
-
-    public String check(String Request,String strContext){
-        session = ParamUtil.getInstance().getSession(Request);
+    //发送文字
+    public String textCheck(String Request, String strContext){
         String request=accountOperation.publishCheck(session,strContext);
         return request;
     }
 
-    public String send(String strContext){
+    public String textSend(String strContext){
         String request=accountOperation.publishSend(session,strContext);
         return request;
     }
+
+    //发送图片+文字
+    public String photoCheck(String Request, String strContext){
+        String request=accountOperation.publishPhotoCheck(session,strContext);
+        return request;
+    }
+
+    public String photoSend(String path, String strContext){
+        String request=accountOperation.publishPhotoSend(session,path,strContext);
+        return request;
+    }
+
 }

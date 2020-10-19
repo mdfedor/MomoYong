@@ -99,25 +99,34 @@ public class StringUtil {
     }
 
     /*Picture read as string data*/
-    static String getImageBinary(String path){
-        String imgStr = "";
-        File f = new File(path);
-        BufferedImage bi;
+    public String getImageBinary(String path){
+        File file = new File(path);
+        InputStream inputStream = null;
         try {
-            bi = ImageIO.read(f);
-            ByteArrayOutputStream baos = new ByteArrayOutputStream();
-            ImageIO.write(bi, "jpg", baos);
-            byte[] bytes = baos.toByteArray();
-
-            imgStr = new String(bytes);
-            return imgStr;
+            inputStream = new FileInputStream(file);
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        byte[] b = new byte[(int)file.length()];
+        try {
+            inputStream.read(b);
+            inputStream.close();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return null;
+        String ImageStr= null;
+        try {
+            ImageStr = new String(b,"ISO-8859-1");
+            ImageStr = new String(b);
+
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return ImageStr;
     }
+
     /*Picture read as byte array*/
-    static byte[] getImageByte(String path){
+    public byte[] getImageByte(String path){
 
         File f = new File(path);
         BufferedImage bi;
@@ -126,7 +135,6 @@ public class StringUtil {
             ByteArrayOutputStream baos = new ByteArrayOutputStream();
             ImageIO.write(bi, "jpg", baos);
             byte[] bytes = baos.toByteArray();
-
             return bytes;
         } catch (IOException e) {
             e.printStackTrace();
@@ -134,7 +142,26 @@ public class StringUtil {
         return null;
     }
 
-    public static String toHex(byte[] bytes) {
+    public String toHexPrint(byte[] bytes) {
+        Formatter formatter = new Formatter();
+        int nInt = bytes.length;
+        int mInt;
+        int count=0;
+
+        for(mInt = 0; mInt < nInt; ++mInt) {
+            if(count!=0&&count%16==0){
+                formatter.format("\r\n");
+            }
+            formatter.format("%02X ", Byte.valueOf(bytes[mInt]));
+            count++;
+        }
+        String string = formatter.toString();
+        formatter.close();
+        return string;
+    }
+
+
+    public String toHex(byte[] bytes) {
         Formatter formatter = new Formatter();
         int nInt = bytes.length;
         int mInt;
@@ -145,7 +172,6 @@ public class StringUtil {
         formatter.close();
         return string;
     }
-
 
     /*
      *File processing
@@ -165,6 +191,19 @@ public class StringUtil {
         }
         return flag;
     }
+
+    public static void savaByteToFile(byte[] data, String path){
+        File fileName=new File(path);
+        FileOutputStream fileOutputStream=null;
+        try {
+            fileOutputStream = new FileOutputStream(fileName);
+            fileOutputStream.write(data);
+            fileOutputStream.close();
+        }catch (Exception e){
+            e.printStackTrace();
+        }
+    }
+
 
     public static String UnGzip(byte[] bytes) throws IOException {
         //      Log.d(TAG, "UnGzip is doing");
@@ -209,6 +248,10 @@ public class StringUtil {
         }
     }
 
+    public static String getNoUrlDecodeMzip(byte[] bytesMzip){
+        return Base64.getEncoder().encodeToString(bytesMzip);
+    }
+
     /*Read the file according to the specified character set*/
     public static String readToString(String fileName) {
         String encoding = "ISO-8859-1";
@@ -237,28 +280,50 @@ public class StringUtil {
         String[] arrayPair = str.split(",");
         List<String> listPair=new ArrayList<>();
         List<String> listTmp=new ArrayList<>();
+        List<List<String>> ListTmp=new ArrayList<>();
+        List<String> jslist=null;
+        boolean jsFlag=false;
         for(String jsStr:arrayPair){
-            if(jsStr.contains("[{")||jsStr.contains("}]")){
+            if(jsStr.contains("[{")){
+                jsFlag=true;                 //以这个[{ 开始
+                if(jsStr.contains("}]")){
+                    jsFlag=false;            //有这种字符串"tags":"[{"from":"album_pic"}]"  一个里面既包含[{  也包含}]
+                    listTmp.add(jsStr);
+                    jslist=ListCopy(listTmp);
+                    ListTmp.add(jslist);     //每个[{}]快都放到一个list中
+                    listTmp.clear();
+                    continue;
+                }
                 listTmp.add(jsStr);
                 continue;
+            }else if(jsStr.contains("}]")){
+                jsFlag=false;                  //表示}]结束
+                listTmp.add(jsStr);
+                jslist=ListCopy(listTmp);
+                ListTmp.add(jslist);           //每个[{}]快都放到一个list中
+                listTmp.clear();
+                continue;
             }
-            listPair.add(jsStr);
+            if(jsFlag){                        //jsFlag=true 说明此时的字段还在[{中间
+                listTmp.add(jsStr);            //把中间的东西放进去
+                continue;
+            }
+            listPair.add(jsStr);                //jsFlag=false  ,正常存放
         }
 
-        if(listTmp.size()!=0){
-            Iterator iter=listTmp.iterator();
+        if(ListTmp.size()!=0){                  //存放list的list
+            Iterator iter=ListTmp.iterator();
             String strTmp="";
-            int count=0;
             while (iter.hasNext()){
-                if(count%2==0){
-                    strTmp+=iter.next()+",";
-                }else
-                {
-                    strTmp+=iter.next();
+                List<String> tmp=(List<String>) iter.next();
+                Iterator itTmp=tmp.iterator();
+                while (itTmp.hasNext()){
+                    strTmp+=itTmp.next()+",";
                 }
-                count++;
+                String newStr=strTmp.substring(0,strTmp.length()-1);
+                strTmp="";
+                listPair.add(newStr);
             }
-            listPair.add(strTmp);
         }
 
         JSONObject jsonObject = new JSONObject();
@@ -270,11 +335,17 @@ public class StringUtil {
             value=listPair.get(n).substring(key.length()+1,listPair.get(n).length());
             jsonObject.put(key,value);
         }
-
         String jsonStr = jsonObject.toString();
-
         return jsonStr;
     }
 
 
+    public static List<String> ListCopy(List<String>psrc){
+        List<String> src=psrc;
+        List<String> des=new ArrayList<>();
+        for (String str:src){
+            des.add(str);
+        }
+        return des;
+    }
 }

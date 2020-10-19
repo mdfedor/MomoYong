@@ -84,7 +84,7 @@ public class ParamUtil {
         MessageDigest digest = MessageDigest.getInstance("SHA-1");
         digest.reset();
         digest.update(arg3.getBytes("UTF-8"));
-        retString =StringUtil.toHex(digest.digest());
+        retString =StringUtil.getInstance().toHex(digest.digest());
         return retString;
     }
 

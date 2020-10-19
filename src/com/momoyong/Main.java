@@ -13,12 +13,19 @@ public class Main {
 
       String pwdRet = manager.pwdLogin(gustRet);
 
-      String checkRet=manager.check(pwdRet,"good morning joy");
 
-      String send=manager.send("good morning joy");
+      String sendtext="you have zero connection.";
+
+      String onlytext="And before they know it, their actual friends start to fade away.";
+
+      //String checkRet=manager.textCheck(pwdRet,onlytext);
+
+      //String send=manager.textSend(onlytext);
+
+       String checkPhotoret=manager.photoCheck(pwdRet,sendtext);
+
+       String sendPhotoret=manager.photoSend("C:\\Users\\JOY\\Pictures\\dog.jpg",sendtext);
 
     }
-
-
 
 }

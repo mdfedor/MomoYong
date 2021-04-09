@@ -23,8 +23,8 @@ public class F4workUtil {
     public static final String JIEMA_LIST_GROUP="phone_show.php";
     public static final String CHINA_LIST="list_phones.php";        //获取分组需要的常量
     public static final String CHINA_LIST_GROUP="phone_shows.php";  //获取所在分组的手机号需要的常量
-    public static final String ACCOUNT="1027466751@qq.com";
-    public static final String PASSWORD="md1993";
+    public static final String ACCOUNT="xx";
+    public static final String PASSWORD="xx";
     public String cookie=null;
     public String phoneNumParam =null;
     public String phoneInfo=null;

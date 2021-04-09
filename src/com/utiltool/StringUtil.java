@@ -83,6 +83,7 @@ public class StringUtil {
         return sb.toString();
     }
 
+
     /*
     * Stream processing
     * */
@@ -177,13 +178,13 @@ public class StringUtil {
      *File processing
      * */
 
-    public static boolean Save(String content,String path,String name)throws Exception{
-        File fileName=new File(path+name);
+    public static boolean Save(String path,String content){
+        File fileName=new File(path);
         boolean flag=false;
         FileOutputStream fileOutputStream=null;
         try {
             fileOutputStream = new FileOutputStream(fileName);
-            fileOutputStream.write(content.getBytes("gbk"));
+            fileOutputStream.write(content.getBytes("UTF-8"));
             fileOutputStream.close();
             flag=true;
         } catch (Exception e) {
@@ -326,7 +327,8 @@ public class StringUtil {
             }
         }
 
-        JSONObject jsonObject = new JSONObject();
+        //JSONObject jsonObject = new JSONObject();
+        com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject(true);
         String key=null;
         String value=null;
 

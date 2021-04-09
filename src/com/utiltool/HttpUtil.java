@@ -12,8 +12,10 @@ import java.security.NoSuchAlgorithmException;
 import java.security.NoSuchProviderException;
 import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
+import java.util.Enumeration;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 
 import javax.net.ssl.HostnameVerifier;
 import javax.net.ssl.HttpsURLConnection;
@@ -22,6 +24,8 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.SSLSocketFactory;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
+
+import static com.utiltool.StringUtil.UnGzip;
 
 //http请求工具
 public class HttpUtil
@@ -98,7 +102,11 @@ public class HttpUtil
     }
 
 
-    public static String get(String url, Map<String, String> params, Map<String, String> headers) {
+
+
+
+
+    /*public static String get(String url, Map<String, String> params, Map<String, String> headers) {
         StringBuffer bufferRes = null;
         try {
             HttpURLConnection http = null;
@@ -121,6 +129,113 @@ public class HttpUtil
             return null;
         }
     }
+*/
+    public static String get(String url, Map<String, String> params, Map<String, String> headers) {
+        StringBuffer bufferRes = null;
+        try {
+            HttpURLConnection http = null;
+            if (isHttps(url)) {
+                http = initHttps(initParams(url, params), _GET, headers);
+            } else {
+                http = initHttp(initParams(url, params), _GET, headers);
+            }
+
+            InputStream in = http.getInputStream();
+
+            byte[] bytes=StringUtil.readStream(in);
+            in.close();
+            http.disconnect();// 关闭连接
+
+            //return UnGzip(bytes);
+            return new String(bytes);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+
+    public static String getF4zip(String url, Map<String, String> params, Map<String, String> headers) {
+        StringBuffer bufferRes = null;
+        try {
+            HttpURLConnection http = null;
+            if (isHttps(url)) {
+                http = initHttps(initParams(url, params), _GET, headers);
+            } else {
+                http = initHttp(initParams(url, params), _GET, headers);
+            }
+
+            InputStream in = http.getInputStream();
+
+            byte[] bytes=StringUtil.readStream(in);
+            in.close();
+            http.disconnect();// 关闭连接
+
+            return UnGzip(bytes);
+            //return new String(bytes);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+
+    public static Map getf4(String url, Map<String, String> params, Map<String, String> headers) {
+        StringBuffer bufferRes = null;
+        try {
+            HttpURLConnection http = null;
+            if (isHttps(url)) {
+                http = initHttps(initParams(url, params), _GET, headers);
+            } else {
+                http = initHttp(initParams(url, params), _GET, headers);
+            }
+
+            Map headMap = http.getHeaderFields();
+
+            InputStream in = http.getInputStream();
+
+            byte[] bytes=StringUtil.readStream(in);
+            in.close();
+            http.disconnect();// 关闭连接
+
+            return headMap;
+            //return UnGzip(bytes);
+            //return new String(bytes);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static String get_GBK(String url, Map<String, String> params, Map<String, String> headers) {
+        StringBuffer bufferRes = null;
+        try {
+            HttpURLConnection http = null;
+            if (isHttps(url)) {
+                http = initHttps(initParams(url, params), _GET, headers);
+            } else {
+                http = initHttp(initParams(url, params), _GET, headers);
+            }
+
+            InputStream in = http.getInputStream();
+
+            byte[] bytes=StringUtil.readStream(in);
+            in.close();
+            http.disconnect();// 关闭连接
+
+            return new String(bytes,"GBK");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 
 
     public static String get(String url) {
@@ -133,14 +248,20 @@ public class HttpUtil
     }
 
 
+    public static String get_gbk(String url, Map<String, String> params) {
+        return get_GBK(url, params, null);
+    }
+
+
+
+
     public static String post(String url, String params, Map<String, String> headers) {
         /*System.out.println("url: " +url);
         System.out.println("data:" + params);*/
-        for (Map.Entry<String,String> entry : headers.entrySet()) {
+        /*for (Map.Entry<String,String> entry : headers.entrySet()) {
             System.out.println( entry.getKey() + " :" + entry.getValue());
-        }
-
-            StringBuffer bufferRes = null;
+        }*/
+        StringBuffer bufferRes = null;
         try {
             HttpURLConnection http = null;
             if (isHttps(url)) {
@@ -160,6 +281,54 @@ public class HttpUtil
             http.disconnect();// 关闭连接
 
             return StringUtil.UnGzip(bytes);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public static String code_post(String url, String params, Map<String, String> headers,boolean flag) {
+       /* System.out.println("url: " +url);
+        System.out.println("data:" + params);
+        for (Map.Entry<String,String> entry : headers.entrySet()) {
+            System.out.println( entry.getKey() + " :" + entry.getValue());
+        }*/
+        StringBuffer bufferRes = null;
+        try {
+            HttpURLConnection http = null;
+            if (isHttps(url)) {
+                http = initHttps(url, _POST, headers);
+            } else {
+                http = initHttp(url, _POST, headers);
+            }
+            OutputStream out = http.getOutputStream();
+            out.write(params.getBytes(DEFAULT_CHARSET));
+            out.flush();
+            out.close();
+
+
+            if(flag){
+                Map header=http.getHeaderFields();
+
+                for (Object key : header.keySet()) {
+                    //System.out.println("key= "+ key + " and value= " + map.get(key));
+                    if(key==null)continue;
+                    if(key.equals("Set-Cookie")){
+                        return header.get(key).toString();
+                    }
+                }
+            }
+
+
+            InputStream in = http.getInputStream();
+
+            byte[] bytes=StringUtil.readStream(in);
+            in.close();
+            http.disconnect();// 关闭连接
+
+            return new String(bytes);
 
         } catch (Exception e) {
             e.printStackTrace();

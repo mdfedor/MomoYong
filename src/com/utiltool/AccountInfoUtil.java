@@ -4,37 +4,40 @@ import net.sf.json.JSONObject;
 
 public class AccountInfoUtil {
 
-    private String birthday;
-    private String gender;
-    private String movie;
-    private String session;
-    private String countrycode;
-    private String book;
-    private String sign;
-    private String industry;
-    private String hangout;
-    private String uptoken;
-    private String password;
-    private String music;
-    private String school;
-    private String interest;
-    private String company;
-    private String tieba;
-    private String relationship;
-    private String email;
-    private String hometown;
-    private String website;
-    private String signcount;
-    private String avatar;
-    private String checkDevToken;
-    private String credit_star;
-    private String phone;
-    private String name;
-    private String job;
-    private String profileVer;
-    private String account;//账号
-    private String publickey;    //生成x_kv和ck
-    private String aesKey;       //生成mzip用的
+    private String birthday="";
+    private String gender="";
+    private String movie="";
+    private String session="";
+    private String countrycode="";
+    private String book="";
+    private String sign="";
+    private String industry="";
+    private String hangout="";
+    private String uptoken="";
+    private String password="";
+    private String music="";
+    private String school="";
+    private String interest="";
+    private String company="";
+    private String tieba="";
+    private String relationship="";
+    private String email="";
+    private String hometown="";
+    private String website="";
+    private String signcount="";
+    private String avatar="";
+    private String checkDevToken="";
+    private String credit_star="";
+    private String phone="";
+    private String name="";
+    private String job="";
+    private String profileVer="";
+    private String account="";//账号
+    private String publickey="";    //生成x_kv和ck
+    private String aesKey="";       //生成mzip用的
+    private String curResource="";  //appcongfig用到
+    private String hashKey="";
+
 
 
     private static AccountInfoUtil instance=null;
@@ -47,6 +50,13 @@ public class AccountInfoUtil {
 
     public AccountInfoUtil(){
 
+    }
+
+    //账号注册需要填写名字，生日，性别三个信息  初始化账号信息，设备信息，初始化的数据可以放在构造函数中，关键看怎么去获取，构造完成后直接可以写入
+    public AccountInfoUtil(String name,String birthday,String sex){
+        this.name=name;
+        this.birthday=birthday;
+        this.gender=sex;
     }
 
     public AccountInfoUtil(String accountInfoJsonStr){
@@ -86,12 +96,15 @@ public class AccountInfoUtil {
         this.job=jsonObject.getString("job");
         this.profileVer=jsonObject.getString("profileVer");
         this.account=jsonObject.getString("account");
-        this.publickey=jsonObject.getString("public_key");
+        this.publickey=jsonObject.getString("publickey");
         this.aesKey=jsonObject.getString("aesKey");
+        this.curResource=jsonObject.getString("curResource");
+        this.hashKey=jsonObject.getString("hashKey");
+
     }
 
     public String AccountInfo2String(){
-        JSONObject jsonObject = new JSONObject();
+        com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject(true);
         jsonObject.put("birthday",this.birthday);
         jsonObject.put("gender",this.gender);
         jsonObject.put("movie",this.movie);
@@ -122,11 +135,21 @@ public class AccountInfoUtil {
         jsonObject.put("job",this.job);
         jsonObject.put("profileVer",this.profileVer);
         jsonObject.put("account",this.account);
-
         jsonObject.put("publickey",this.publickey);
         jsonObject.put("aesKey",this.aesKey);
+        jsonObject.put("curResource",this.curResource);
+        jsonObject.put("hashKey",this.hashKey);
 
         return jsonObject.toString();
+    }
+
+    //保存某个字段到文件中 param  路径,内容
+    public void SaveValue2File(String filePath,String Context){
+        try {
+            StringUtil.getInstance().Save(filePath,Context);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
 
 
@@ -134,129 +157,263 @@ public class AccountInfoUtil {
         return birthday;
     }
 
+    public void setBirthday(String birthday) {
+        this.birthday = birthday;
+    }
+
     public String getGender() {
         return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 
     public String getMovie() {
         return movie;
     }
 
+    public void setMovie(String movie) {
+        this.movie = movie;
+    }
+
     public String getSession() {
         return session;
+    }
+
+    public void setSession(String session) {
+        this.session = session;
     }
 
     public String getCountrycode() {
         return countrycode;
     }
 
+    public void setCountrycode(String countrycode) {
+        this.countrycode = countrycode;
+    }
+
     public String getBook() {
         return book;
+    }
+
+    public void setBook(String book) {
+        this.book = book;
     }
 
     public String getSign() {
         return sign;
     }
 
+    public void setSign(String sign) {
+        this.sign = sign;
+    }
+
     public String getIndustry() {
         return industry;
+    }
+
+    public void setIndustry(String industry) {
+        this.industry = industry;
     }
 
     public String getHangout() {
         return hangout;
     }
 
+    public void setHangout(String hangout) {
+        this.hangout = hangout;
+    }
+
     public String getUptoken() {
         return uptoken;
+    }
+
+    public void setUptoken(String uptoken) {
+        this.uptoken = uptoken;
     }
 
     public String getPassword() {
         return password;
     }
 
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
     public String getMusic() {
         return music;
+    }
+
+    public void setMusic(String music) {
+        this.music = music;
     }
 
     public String getSchool() {
         return school;
     }
 
+    public void setSchool(String school) {
+        this.school = school;
+    }
+
     public String getInterest() {
         return interest;
+    }
+
+    public void setInterest(String interest) {
+        this.interest = interest;
     }
 
     public String getCompany() {
         return company;
     }
 
+    public void setCompany(String company) {
+        this.company = company;
+    }
+
     public String getTieba() {
         return tieba;
+    }
+
+    public void setTieba(String tieba) {
+        this.tieba = tieba;
     }
 
     public String getRelationship() {
         return relationship;
     }
 
+    public void setRelationship(String relationship) {
+        this.relationship = relationship;
+    }
+
     public String getEmail() {
         return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
     }
 
     public String getHometown() {
         return hometown;
     }
 
+    public void setHometown(String hometown) {
+        this.hometown = hometown;
+    }
+
     public String getWebsite() {
         return website;
+    }
+
+    public void setWebsite(String website) {
+        this.website = website;
     }
 
     public String getSigncount() {
         return signcount;
     }
 
+    public void setSigncount(String signcount) {
+        this.signcount = signcount;
+    }
+
     public String getAvatar() {
         return avatar;
+    }
+
+    public void setAvatar(String avatar) {
+        this.avatar = avatar;
     }
 
     public String getCheckDevToken() {
         return checkDevToken;
     }
 
+    public void setCheckDevToken(String checkDevToken) {
+        this.checkDevToken = checkDevToken;
+    }
+
     public String getCredit_star() {
         return credit_star;
+    }
+
+    public void setCredit_star(String credit_star) {
+        this.credit_star = credit_star;
     }
 
     public String getPhone() {
         return phone;
     }
 
+    public void setPhone(String phone) {
+        this.phone = phone;
+    }
+
     public String getName() {
         return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
     }
 
     public String getJob() {
         return job;
     }
 
+    public void setJob(String job) {
+        this.job = job;
+    }
+
     public String getProfileVer() {
         return profileVer;
     }
 
+    public void setProfileVer(String profileVer) {
+        this.profileVer = profileVer;
+    }
 
     public String getAccount() {
         return account;
+    }
+
+    public void setAccount(String account) {
+        this.account = account;
     }
 
     public String getPublickey() {
         return publickey;
     }
 
+    public void setPublickey(String publickey) {
+        this.publickey = publickey;
+    }
 
     public String getAesKey() {
         return aesKey;
     }
 
-    public void setSession(String session) {
-        this.session = session;
+    public void setAesKey(String aesKey) {
+        this.aesKey = aesKey;
+    }
+
+    public String getCurResource() {
+        return curResource;
+    }
+
+    public void setCurResource(String curResource) {
+        this.curResource = curResource;
+    }
+
+    public String getHashKey() {
+        return hashKey;
+    }
+
+    public void setHashKey(String hashKey) {
+        this.hashKey = hashKey;
     }
 }

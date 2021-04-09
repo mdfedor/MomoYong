@@ -4,21 +4,22 @@ import net.sf.json.JSONObject;
 
 public class HeaderInfoUtil {
 
-    private String X_Span_Id;
-    private String cookie;
-    private String X_KV;
-    private String Connection;
-    private String User_Agent;
-    private String Charset;
-    private String MultiUA;
-    private String Host;
-    private String Accept_Encoding;
-    private String X_Trace_Id;
-    private String X_LV;
-    private String X_SIGN;
-    private String Accept_Language;
-    private String Content_Length;
-    private String Content_Type;
+    private String X_Span_Id="";
+    private String cookie="";
+    private String X_KV="";
+    private String Connection="";
+    private String User_Agent="";
+    private String Charset="";
+    private String MultiUA="";
+    private String Host="";
+    private String Accept_Encoding="";
+    private String X_Trace_Id="";
+    private String X_LV="";
+    private String X_SIGN="";
+    private String Accept_Language="";
+    private String Content_Length="";
+    private String Content_Type="";
+    private String logHost="";
 
     private static HeaderInfoUtil instance=null;
 
@@ -53,7 +54,30 @@ public class HeaderInfoUtil {
         this.Accept_Language=jsonObject.getString("Accept-Language");
         this.Content_Length=jsonObject.getString("Content-Length");
         this.Content_Type=jsonObject.getString("Content-Type");
+        this.logHost=jsonObject.getString("logHost"); //日志host
     }
+
+    public String HeaderInfo2String(){
+        com.alibaba.fastjson.JSONObject jsonObject = new com.alibaba.fastjson.JSONObject(true);    //排列顺序会一样
+        jsonObject.put("Content-Length",this.Content_Length);
+        jsonObject.put("X-SIGN",this.X_SIGN);
+        jsonObject.put("X-Trace-Id",this.X_Trace_Id);
+        jsonObject.put("X-KV",this.X_KV);
+        jsonObject.put("X-LV",this.X_LV);
+        jsonObject.put("cookie",this.cookie);
+        jsonObject.put("X-Span-Id",this.X_Span_Id);
+        jsonObject.put("Charset",this.Charset);
+        jsonObject.put("Connection",this.Connection);
+        jsonObject.put("User-Agent",this.User_Agent);
+        jsonObject.put("MultiUA",this.MultiUA);
+        jsonObject.put("Accept-Language",this.Accept_Language);
+        jsonObject.put("Host",this.Host);
+        jsonObject.put("Accept-Encoding",this.Accept_Encoding);
+        jsonObject.put("Content-Type",this.Content_Type);
+        jsonObject.put("logHost",this.logHost);
+        return jsonObject.toString();
+    }
+
 
     public String getX_Span_Id() {
         return X_Span_Id;
@@ -87,12 +111,12 @@ public class HeaderInfoUtil {
         Connection = connection;
     }
 
-    public String getUserAgent() {
+    public String getUser_Agent() {
         return User_Agent;
     }
 
-    public void setUserAgent(String userAgent) {
-        User_Agent = userAgent;
+    public void setUser_Agent(String user_Agent) {
+        User_Agent = user_Agent;
     }
 
     public String getCharset() {
@@ -175,11 +199,11 @@ public class HeaderInfoUtil {
         Content_Type = content_Type;
     }
 
-    public static HeaderInfoUtil getInstance() {
-        return instance;
+    public String getLogHost() {
+        return logHost;
     }
 
-    public static void setInstance(HeaderInfoUtil instance) {
-        HeaderInfoUtil.instance = instance;
+    public void setLogHost(String logHost) {
+        this.logHost = logHost;
     }
 }

@@ -22,18 +22,16 @@ public class CryptUtil {
 
     public byte[] encrypt(byte[] sSrc,  byte[] sKey, byte[] ivParameter) throws Exception {
         Cipher cipher = Cipher.getInstance("AES/CBC/PKCS5Padding");
-        byte[] raw = sKey;
 
-        SecretKeySpec skeySpec = new SecretKeySpec(raw, "AES");
+        SecretKeySpec skeySpec = new SecretKeySpec(sKey, "AES");
         IvParameterSpec iv = new IvParameterSpec(ivParameter);
         cipher.init(Cipher.ENCRYPT_MODE, skeySpec, iv);
-        byte[] encrypted = cipher.doFinal(sSrc);
         //	return new BASE64Encoder().encode(encrypted);
-        return encrypted;
+        return cipher.doFinal(sSrc);
     }
 
 
-    public static byte[] decrypt(byte[] sSrc, byte[] sKey, byte[] ivParameter) throws Exception {
+    public byte[] decrypt(byte[] sSrc, byte[] sKey, byte[] ivParameter) throws Exception {
         try {
 
             SecretKeySpec skeySpec = new SecretKeySpec(sKey, "AES");
@@ -43,8 +41,7 @@ public class CryptUtil {
 //			byte[] encrypted1 = new BASE64Decoder().decodeBuffer(sSrc);
             System.out.print("\n");
 
-            byte[] original = cipher.doFinal(sSrc);
-            return original;
+            return cipher.doFinal(sSrc);
         } catch (Exception ex) {
             ex.printStackTrace();
             return null;
@@ -60,8 +57,7 @@ public class CryptUtil {
     public byte[] getIvNum() {
 //		int num = 1000 + (int)(Math.random() * (9999-1000+1));
 //		return intToByte(num);
-        byte[] a={-40, -83, 81, 41};
-        return a;
+        return new byte[]{-40, -83, 81, 41};
     }
 
 
@@ -74,8 +70,7 @@ public class CryptUtil {
         try {
             MessageDigest mdTemp = MessageDigest.getInstance("SHA1");
             mdTemp.update(info);
-            byte[] hash = mdTemp.digest();
-            return hash;
+            return mdTemp.digest();
         } catch (Exception e) {
             // TODO: handle exception
             return null;
@@ -114,29 +109,6 @@ public class CryptUtil {
         return retStr;
     }
 
-
-//    public String momoEncode(byte[] src,byte[] key) throws Exception {
-//
-//        byte[] ivNUm=getIvNum();
-//        byte[] iv=ivGenerate(ivNUm);
-//
-//        byte[] outBytes= CryptUtil.getInstance().encrypt(src, key, iv);
-//        byte[] header=new byte[7];
-//        header[0]=02;
-//        header[1]=03;
-//
-//        System.arraycopy(ivNUm, 0, header, 2, 4);
-//        header[6]=00;
-//        byte[] total=new byte[outBytes.length+7];
-//        System.arraycopy(header, 0, total, 0, 7);
-//        System.arraycopy(outBytes, 0, total, 7, outBytes.length);
-//
-//        byte[] base64Str= Base64.getEncoder().encode(total);
-//
-//        String outStr=new String(base64Str);
-//
-//        return outStr;
-//    }
 
     public byte[] momoEncode(byte[] src,byte[] key) throws Exception {
 
@@ -192,6 +164,9 @@ public class CryptUtil {
         } catch (IOException e) {
             e.printStackTrace();
         }
+        if(gzipInputStream==null){
+            return null;
+        }
 
         ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         int writeLen;
@@ -201,11 +176,25 @@ public class CryptUtil {
         }
         byte[] data = byteArrayOutputStream.toByteArray();
         byteArrayOutputStream.close();
+
+        if(data[0]!=2&&data[1]!=3){
+            return new String(data);
+        }
         String decodeStr= "";
         try{
             decodeStr= CryptUtil.getInstance().momoDecode(data,aesKey.getBytes());
         }catch (Exception e){
-            return new String(data);
+            //return new String(data);
+        }
+        return decodeStr;
+    }
+
+    public String decodeRespone_no_zip(byte[] bStr,String aesKey){
+        String decodeStr= "";
+        try{
+            decodeStr= CryptUtil.getInstance().momoDecode(bStr,aesKey.getBytes());
+        }catch (Exception e){
+            return new String(bStr);
         }
         return decodeStr;
     }
